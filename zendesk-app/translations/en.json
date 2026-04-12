@@ -1,0 +1,8 @@
+{
+  "app": {
+    "name": "Agent Assist Supervisor",
+    "short_description": "Google Cloud Agent Assist AI Coach Integration for Zendesk",
+    "long_description": "Provides real-time AI coaching suggestions and smart replies based on Google Cloud Agent Assist directly within Zendesk Support tickets.",
+    "installation_instructions": "Upload and install to enable real-time SSE communication with the Agent Assist Cloud Run backend."
+  }
+}

@@ -1,0 +1,4 @@
+node_modules/
+backup_20260412/
+*.zip
+.DS_Store
