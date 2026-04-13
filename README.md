@@ -1,8 +1,11 @@
-# Google Cloud Agent Assist - Zendesk Integration
+# Google Cloud Agent Assist - Zendesk Integration (Sample Code)
 
-이 프로젝트는 Google Cloud의 Agent Assist(AI 추천) 기능을 Zendesk의 사이드바 앱으로 연동하기 위한 솔루션입니다. 상담사가 고객과 대화할 때 실시간으로 AI가 최적의 답변이나 가이드를 추천해 줍니다.
+> **[Notice]** 본 프로젝트는 Proof of Concept(PoC) 및 연동 가이드를 위한 **샘플 코드**입니다. 
+> 상용 환경에서 사용하기 위해서는 보안 강화 및 예외 처리 등 추가적인 구현이 필요합니다.
 
-## 🏗 아키텍처 특징: 왜 서버 사이드(Remote Hosted) 방식인가?
+이 프로젝트는 Google Cloud의 Agent Assist(AI 추천) 기능을 Zendesk의 사이드바 앱으로 연동하기 위한 솔루션입니다.
+
+## 아키텍처 특징: Remote Hosted 방식
 
 본 앱은 Zendesk 내부에 모든 소스코드를 포함하는 클라이언트 사이드 방식이 아닌, **외부 서버(Google Cloud Run)에 소스를 올리고 Zendesk는 이를 읽어가는 Remote Hosted 방식**으로 구현되었습니다.
 
@@ -13,7 +16,7 @@
 
 ---
 
-## 📐 시스템 아키텍처 및 흐름도
+## 시스템 아키텍처 및 흐름도
 
 이 솔루션의 전체적인 아키텍처와 데이터 흐름은 다음과 같습니다. (공식 Google 가이드 기준)
 
@@ -22,15 +25,14 @@ graph TD
     subgraph GCP ["GCP 환경"]
         subgraph BackendModule ["AA Integration Pub/Sub Backend Module"]
             PubSub["Cloud Pub/Sub"]
-            SecretManager["Secret Manager"]
             Redis["Memorystore Redis"]
             Interceptor["Cloud Pub/Sub Interceptor (Cloud Run)"]
             UIConnector["UI Connector (Cloud Run)"]
         end
         Dialogflow["Dialogflow"]
+        CustomBackend["Custom Backend (Cloud Run)"]
     end
 
-    AuthBackend["Authentication Backend"]
     AgentDesktop["Agent Desktop (Zendesk App)"]
 
     Dialogflow -->|Publishes event notifications| PubSub
@@ -38,21 +40,22 @@ graph TD
     Interceptor -->|Publishes events to channels| Redis
     UIConnector -->|Subscribes to channels| Redis
     UIConnector -->|Sends feedback signals| Dialogflow
-    SecretManager -->|Provides JWT secret key| UIConnector
-    UIConnector -->|Authenticates agent| AuthBackend
-    AgentDesktop -->|WebSocket / HTTP| UIConnector
+    
+    AgentDesktop -->|WebSocket| UIConnector
+    AgentDesktop -->|HTTP (Create/Send)| CustomBackend
+    CustomBackend -->|Dialogflow API requests| Dialogflow
 ```
 
-**💡 데이터 흐름 설명:**
-1. **이벤트 발생:** 고객과 대화 중 AI 추천이 생성되면 **Dialogflow**가 이벤트를 **Cloud Pub/Sub**으로 발행합니다.
-2. **이벤트 전달:** **Pub/Sub**은 등록된 푸시 구독을 통해 **Cloud Pub/Sub Interceptor**로 이벤트를 밀어줍니다(HTTP POST).
-3. **채널 브로커 (Redis):** **Interceptor**는 이벤트를 **Memorystore Redis**의 Pub/Sub 채널에 발행합니다.
-4. **실시간 전송:** **UI Connector**는 Redis 채널을 구독하고 있다가, 해당 이벤트를 연결된 **Zendesk 앱(Agent Desktop)**으로 웹소켓을 통해 실시간으로 전송합니다.
-5. **인증 및 피드백:** **UI Connector**는 **Secret Manager**의 JWT 키를 이용해 인증을 처리하고, 사용자의 피드백 신호를 **Dialogflow**로 다시 전달합니다.
+**데이터 흐름 설명:**
+1. **대화 초기화:** Zendesk 앱이 **Custom Backend**에 세션 생성을 요청하고, Custom Backend는 **Dialogflow** API를 호출하여 대화를 생성합니다.
+2. **이벤트 발생:** 고객과 대화 중 AI 추천이 생성되면 **Dialogflow**가 이벤트를 **Cloud Pub/Sub**으로 발행합니다.
+3. **이벤트 전달:** **Pub/Sub**은 푸시 구독을 통해 **Cloud Pub/Sub Interceptor**로 이벤트를 전달합니다.
+4. **상태 공유:** **Interceptor**는 이벤트를 **Memorystore Redis**의 Pub/Sub 채널에 발행합니다.
+5. **실시간 전송:** **UI Connector**는 Redis 채널을 구독하여 이벤트를 수신하고, 이를 **Zendesk 앱**에 WebSocket으로 실시간 전송합니다.
 
 ---
 
-## 📋 사전 준비 사항
+## 사전 준비 사항
 
 1. **Google Cloud Platform (GCP) 계정** 및 프로젝트
 2. **Agent Assist 설정:**
@@ -62,7 +65,7 @@ graph TD
 
 ---
 
-## 📚 관련 문서 및 참고 링크
+## 관련 문서 및 참고 링크
 
 솔루션의 심화 이해 및 커스터마이징을 위해 아래 공식 가이드 문서를 참고하시는 것을 강력히 권장합니다.
 
@@ -75,7 +78,7 @@ graph TD
 
 ---
 
-## 🚀 차근차근 따라 하는 설정 및 실행 방법
+## 설정 및 실행 방법
 
 젠데스크와 구글 Agent Assist를 연동하기 위한 단계별 가이드입니다. 천천히 따라 해 보세요!
 

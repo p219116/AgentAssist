@@ -1,8 +1,10 @@
 /**
- * Zendesk Sidebar App - Client Side Logic
+ * Zendesk Sidebar App - Client Side Logic (Sample Code)
  * 
- * 이 파일은 젠데스크 사이드바 화면에서 동작하며,
- * UI Connector(Socket.IO)와 통신하여 실시간 AI 추천을 화면에 표시합니다.
+ * [주의] 본 코드는 PoC(Proof of Concept) 및 연동 테스트를 위한 샘플 코드입니다.
+ * 상용 환경 적용 시에는 자격 증명 관리 및 예외 처리를 강화해야 합니다.
+ * 
+ * 역할: UI Connector(Socket.IO)와 통신하여 실시간 AI 추천 표시
  */
 
 // Zendesk App Framework (ZAF) 클라이언트 초기화
@@ -78,7 +80,7 @@ client.on('app.registered', () => {
                       if (info.toolCall) {
                         const name = info.toolCall.toolDisplayName || '스마트 툴';
                         const details = info.toolCall.toolDisplayDetails || '';
-                        displayText += `📌 **${name}**: ${details}<br>`;
+                        displayText += `**${name}**: ${details}<br>`;
                       }
                       
                       // Extract result content
@@ -86,12 +88,12 @@ client.on('app.registered', () => {
                         try {
                           const contentObj = JSON.parse(info.toolCallResult.content);
                           if (contentObj.customer_message) {
-                            displayText += `💡 ${contentObj.customer_message}`;
+                            displayText += `${contentObj.customer_message}`;
                           } else {
-                            displayText += `💡 ${info.toolCallResult.content}`;
+                            displayText += `${info.toolCallResult.content}`;
                           }
                         } catch (e) {
-                          displayText += `💡 ${info.toolCallResult.content}`;
+                          displayText += `${info.toolCallResult.content}`;
                         }
                       }
                       
