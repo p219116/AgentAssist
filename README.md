@@ -42,7 +42,7 @@ graph TD
     UIConnector -->|Sends feedback signals| Dialogflow
     
     AgentDesktop -->|WebSocket| UIConnector
-    AgentDesktop -->|HTTP (Create/Send)| CustomBackend
+    AgentDesktop -->|"HTTP (Create/Send)"| CustomBackend
     CustomBackend -->|Dialogflow API requests| Dialogflow
 ```
 
@@ -109,9 +109,9 @@ graph TD
    const connectorUrl = 'https://<your-ui-connector-url>';
    ```
 
-### 3단계: 젠데스크 앱 패키징 및 업로드 (★가장 중요)
+### 3단계: 젠데스크 앱 패키징 및 업로드
 
-젠데스크 시스템에는 대용량 소스 코드를 올릴 필요가 없습니다. **"우리 서버를 바라보라"는 명함(설정 파일)**만 묶어서 올려주시면 됩니다.
+젠데스크 시스템에는 소스 코드 전체를 업로드할 필요가 없으며, 매니페스트 설정 파일과 정적 자산만 패키징하여 업로드합니다.
 
 1. `zendesk-app` 폴더로 이동합니다.
 2. `manifest.json` 파일을 열고, `ticket_sidebar` 항목의 URL을 **1단계에서 배포한 백엔드 서버의 주소**로 수정합니다.
@@ -121,11 +121,11 @@ graph TD
        "ticket_sidebar": "https://<your-backend-url>/zendesk/index.html"
      }
    },
-   "domainWhitelist": ["<your-backend-domain-only>"] // 예: your-backend-...run.app
+   "domainWhitelist": ["<your-backend-domain-only>"]
    ```
-3. **[🚨 절대 주의] ZIP 파일 만들기:**
-   * `zendesk-app` **폴더 자체를 우클릭해서 압축하시면 안 됩니다!**
-   * 반드시 `zendesk-app` 폴더 **안으로 들어가서** `manifest.json` 파일과 `assets` 폴더 등 **내용물들을 한꺼번에 드래그하여** ZIP 파일로 압축해 주세요.
+3. **ZIP 파일 생성 시 주의사항:**
+   * `zendesk-app` 폴더 자체를 압축하지 마십시오.
+   * 반드시 `zendesk-app` 폴더 내부의 파일 및 폴더들(`manifest.json`, `assets` 등)을 직접 선택하여 압축해야 합니다.
 4. 젠데스크 관리자 화면(`관리자 센터`)에 접속합니다.
 5. `앱 및 통합` -> `Zendesk 통합 앱` -> `앱 업로드` 메뉴로 이동합니다.
 6. 방금 만든 ZIP 파일을 선택하고 업로드하면 모든 설정이 끝납니다!
