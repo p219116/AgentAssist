@@ -20,7 +20,7 @@ client.on('app.registered', () => {
   console.log('[ZAF Client] Initialized successfully. Connecting to WebSocket...');
 
   // Connect to UI Connector via Socket.IO
-  const connectorUrl = 'https://ui-connector-147944213110.us-central1.run.app';
+  const connectorUrl = 'https://<your-ui-connector-url>';
   console.log(`[Socket.IO] Connecting to ${connectorUrl}`);
 
   // Try to get JWT token first (optimistic fallback if auth is disabled)
