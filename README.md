@@ -26,26 +26,3 @@ sequenceDiagram
     Pub-->>Ui: 4. Interceptor 거쳐 UI Connector 진입
     Ui-->>Zd: 5. [WebSocket] 실시간 AI 답변 상담원에게 Push
 ```
-
----
-
-## 2. 구축 및 실행 단계 (Getting Started)
-
-### 💻 Environment Variables 설정
-미들웨어 구동을 위해 시스템 환경변수에 아래 정보가 주입되어야 합니다.
-```bash
-export GOOGLE_APPLICATION_CREDENTIALS="./google-account-key.json"
-```
-
-### 💻 패키지 기동
-```bash
-npm install
-node server.js
-```
-
----
-
-## 3. 환경 변수 대체 규격
-코드 내 다음 값들은 고객사의 GCP 인프라 명세에 맞춰 완전 대체되어야 합니다.
-*   `your-gcp-project-id`
-*   `https://<your-ui-connector-url>`
