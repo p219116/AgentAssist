@@ -7,6 +7,28 @@ Google Cloud Agent Assist Integration Backend 가이드 기반으로 구현된, 
 
 ---
 
+## 아키텍처 개요 (System Architecture)
+
+본 시스템은 대화 분석이 백그라운드 비동기 이벤트로 가동되는 **이벤트 기반(Event-Driven) 설계**를 따릅니다.
+
+### 🔄 전체 데이터 흐름 (Data Flow)
+```mermaid
+sequenceDiagram
+    participant Zd as Zendesk 앱 (화면)
+    participant Cb as Custom Backend
+    participant Df as Dialogflow CX (AI)
+    participant Pub as Cloud Pub/Sub
+    participant Ui as UI Connector (GCP)
+
+    Zd->>Cb: 1. [HTTP POST] 상담원 대화 송신
+    Cb->>Df: 2. [인증] Dialogflow 컨텍스트 분석 요청
+    Df-->>Pub: 3. Pub/Sub Notification 비동기 격발
+    Pub-->>Ui: 4. Interceptor 거쳐 UI Connector 진입
+    Ui-->>Zd: 5. [WebSocket] 실시간 AI 답변 상담원에게 Push
+```
+
+---
+
 ## 1. 참고 문서 (Reference Documentation)
 
 ### 🔗 Google Cloud Agent Assist Integration Backend 가이드
